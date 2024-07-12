@@ -24,19 +24,39 @@ contract AddLiquidTest is Test {
     }
 
     function test_AddLiquidity() public {
-        (uint256 reserve0, uint256 reserve1,) = IUniswapV2Pair(pool).getReserves();
+        (uint256 reserve0, uint256 reserve1, ) = IUniswapV2Pair(pool)
+            .getReserves();
+        console2.log(
+            "token0 %s token1 %s",
+            IUniswapV2Pair(pool).token0(),
+            IUniswapV2Pair(pool).token1()
+        );
+        console2.log("Reserve0: %s, Reserve1: %s", reserve0, reserve1);
         uint256 _totalSupply = IUniswapV2Pair(pool).totalSupply();
+        console2.log("Total Supply: %s", _totalSupply);
 
         vm.prank(address(0xb0b));
         addLiquid.addLiquidity(usdc, weth, pool, reserve0, reserve1);
 
-        uint256 foo = (1000 * 10 ** 6) - (IUniswapV2Pair(usdc).balanceOf(address(addLiquid)));
-
+        uint256 foo = (1000 * 10 ** 6) -
+            (IUniswapV2Pair(usdc).balanceOf(address(addLiquid)));
+        console2.log(
+            "foo: %s, usdc balance of addLiquidity Pool",
+            foo,
+            (IUniswapV2Pair(usdc).balanceOf(address(addLiquid)))
+        );
         uint256 puzzleBal = IUniswapV2Pair(pool).balanceOf(address(0xb0b));
+        console2.log("Puzzle Balance: %s", puzzleBal);
 
         uint256 bar = (foo * reserve1) / reserve0;
 
-        uint256 expectBal = min((foo * _totalSupply) / (reserve0), (bar * _totalSupply) / (reserve1));
+        console2.log("bar: %s", bar);
+
+        uint256 expectBal = min(
+            (foo * _totalSupply) / (reserve0),
+            (bar * _totalSupply) / (reserve1)
+        );
+        console2.log("Expect Balance: %s", expectBal);
 
         require(puzzleBal > 0);
         assertEq(puzzleBal, expectBal);
