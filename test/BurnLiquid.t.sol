@@ -27,6 +27,8 @@ contract BurnLiquidTest is Test {
 
         uint256 usdcBal = IUniswapV2Pair(usdc).balanceOf(address(burnLiquid));
         uint256 wethBal = IUniswapV2Pair(weth).balanceOf(address(burnLiquid));
+        console2.log("USDC balance: %s", usdcBal);
+        console2.log("WETH balance: %s", wethBal);
 
         assertEq(usdcBal, 1432558576085);
         assertEq(wethBal, 388231892770818155977);

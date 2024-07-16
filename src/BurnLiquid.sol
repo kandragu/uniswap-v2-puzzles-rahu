@@ -4,6 +4,8 @@ pragma solidity ^0.8.13;
 import "./interfaces/IUniswapV2Pair.sol";
 import "./interfaces/IERC20.sol";
 
+import {console} from "forge-std/Test.sol";
+
 contract BurnLiquid {
     /**
      *  BURN LIQUIDITY WITHOUT ROUTER EXERCISE
@@ -20,5 +22,15 @@ contract BurnLiquid {
          *     to: recipient address to receive tokenA and tokenB.
          */
         // your code here
+
+        IUniswapV2Pair _pool = IUniswapV2Pair(pool);
+
+        uint256 lpBalance = _pool.balanceOf(address(this));
+
+        console.log("LP tokens to burn:", lpBalance);
+
+        IUniswapV2Pair(pool).transfer(pool, lpBalance);
+
+        _pool.burn(address(this));
     }
 }

@@ -33,8 +33,8 @@ contract AddLiquidWithRouterTest is Test {
         vm.prank(address(0xb0b));
         addLiquidWithRouterAddress.addLiquidityWithRouter(usdc, deadline);
 
-        // uint256 puzzleBal = IUniswapV2Pair(pool).balanceOf(address(0xb0b));
+        uint256 puzzleBal = IUniswapV2Pair(pool).balanceOf(address(0xb0b));
 
-        // require(puzzleBal > 0);
+        require(puzzleBal > 0);
     }
 }
