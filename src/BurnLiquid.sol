@@ -1,10 +1,8 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.13;
+pragma solidity 0.8.19;
 
 import "./interfaces/IUniswapV2Pair.sol";
 import "./interfaces/IERC20.sol";
-
-import {console} from "forge-std/Test.sol";
 
 contract BurnLiquid {
     /**
@@ -27,22 +25,8 @@ contract BurnLiquid {
 
         uint256 lpBalance = _pool.balanceOf(address(this));
 
-        console.log("LP tokens to burn:", lpBalance);
-
         IUniswapV2Pair(pool).transfer(pool, lpBalance);
 
         _pool.burn(address(this));
-
-        // calculate the amount of USDC and WETH received given the lp balance
-        // get pool reserves
-        (uint112 reserve0, uint112 reserve1, ) = _pool.getReserves();
-        //get the total supply of the pool
-        uint256 totalSupply = _pool.totalSupply();
-        // calculate the amount of USDC and WETH received
-        uint256 usdcBal = (lpBalance * reserve0) / totalSupply;
-        uint256 wethBal = (lpBalance * reserve1) / totalSupply;
-
-        console.log("USDC received:", usdcBal);
-        console.log("WETH received:", wethBal);
     }
 }
