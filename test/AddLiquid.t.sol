@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.13;
+pragma solidity 0.8.19;
 
 import {Test, console2} from "forge-std/Test.sol";
 import {AddLiquid} from "../src/AddLiquid.sol";
@@ -40,23 +40,15 @@ contract AddLiquidTest is Test {
 
         uint256 foo = (1000 * 10 ** 6) -
             (IUniswapV2Pair(usdc).balanceOf(address(addLiquid)));
-        console2.log(
-            "foo: %s, usdc balance of addLiquidity Pool",
-            foo,
-            (IUniswapV2Pair(usdc).balanceOf(address(addLiquid)))
-        );
+
         uint256 puzzleBal = IUniswapV2Pair(pool).balanceOf(address(0xb0b));
-        console2.log("Puzzle Balance: %s", puzzleBal);
 
         uint256 bar = (foo * reserve1) / reserve0;
-
-        console2.log("bar: %s", bar);
 
         uint256 expectBal = min(
             (foo * _totalSupply) / (reserve0),
             (bar * _totalSupply) / (reserve1)
         );
-        console2.log("Expect Balance: %s", expectBal);
 
         require(puzzleBal > 0);
         assertEq(puzzleBal, expectBal);

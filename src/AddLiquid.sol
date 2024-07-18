@@ -1,8 +1,7 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.13;
+pragma solidity 0.8.19;
 
 import "./interfaces/IUniswapV2Pair.sol";
-import {console} from "forge-std/Test.sol";
 
 contract AddLiquid {
     /**
@@ -33,13 +32,20 @@ contract AddLiquid {
             1 ether
         );
 
-        console.log("Optimal Foo: %s, Optimal Bar: %s", optimalFoo, optimalBar);
         IUniswapV2Pair(usdc).transfer(pool, optimalFoo);
         IUniswapV2Pair(weth).transfer(pool, optimalBar);
 
         pair.mint(msg.sender);
     }
 
+    // @dev Calculate the optimal amount of token0 and token1 to provide to a Uniswap V2 pair
+    // to maximize the amount of liquidity minted
+    // @param reserve0 The current reserve of token0 in the pair
+    // @param reserve1 The current reserve of token1 in the pair
+    // @param amount0Desired The desired amount of token0 to provide
+    // @param amount1Desired The desired amount of token1 to provide
+    // @return amount0 The optimal amount of token0 to provide
+    // @return amount1 The optimal amount of token1 to provide
     function calculateOptimalLiquidity(
         uint256 reserve0,
         uint256 reserve1,
