@@ -20,17 +20,29 @@ contract BurnLiquidWithRouterTest is Test {
 
         // transfers 0.01 UNI-V2-LP to BurnLiquidWithRouterAddress
         vm.prank(0x18498Ab9931c671742C4fF0CA292c1876CaB7384);
-        IUniswapV2Pair(pool).transfer(address(burnLiquidWithRouterAddress), 0.01 ether);
+        IUniswapV2Pair(pool).transfer(
+            address(burnLiquidWithRouterAddress),
+            0.01 ether
+        );
     }
 
     function test_BurnLiquidityWithRouter() public {
         uint256 deadline = block.timestamp + 1 minutes;
 
         vm.prank(address(0xb0b));
-        burnLiquidWithRouterAddress.burnLiquidityWithRouter(pool, usdc, weth, deadline);
+        burnLiquidWithRouterAddress.burnLiquidityWithRouter(
+            pool,
+            usdc,
+            weth,
+            deadline
+        );
 
-        uint256 usdcBal = IUniswapV2Pair(usdc).balanceOf(address(burnLiquidWithRouterAddress));
-        uint256 wethBal = IUniswapV2Pair(weth).balanceOf(address(burnLiquidWithRouterAddress));
+        uint256 usdcBal = IUniswapV2Pair(usdc).balanceOf(
+            address(burnLiquidWithRouterAddress)
+        );
+        uint256 wethBal = IUniswapV2Pair(weth).balanceOf(
+            address(burnLiquidWithRouterAddress)
+        );
 
         assertEq(usdcBal, 1432558576085);
         assertEq(wethBal, 388231892770818155977);
