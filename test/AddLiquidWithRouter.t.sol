@@ -17,7 +17,7 @@ contract AddLiquidWithRouterTest is Test {
         );
 
         // transfers 1 ETH to addLiquidWithRouterAddress
-        vm.deal(address(addLiquidWithRouterAddress), 2 ether);
+        vm.deal(address(addLiquidWithRouterAddress), 1 ether);
 
         // transfers 1000 USDC to addLiquidWithRouterAddress
         vm.prank(0x4B16c5dE96EB2117bBE5fd171E4d203624B014aa);
