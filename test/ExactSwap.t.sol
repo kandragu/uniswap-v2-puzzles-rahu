@@ -22,17 +22,20 @@ contract ExactSwapTest is Test {
     }
 
     function test_PerformExactSwap() public {
-        (uint256 r0, uint256 r1,) = IUniswapV2Pair(pool).getReserves();
+        (uint256 r0, uint256 r1, ) = IUniswapV2Pair(pool).getReserves();
 
         vm.prank(address(0xb0b));
         exactSwap.performExactSwap(pool, weth, usdc);
 
-        uint256 foo = (1 ether) - (IUniswapV2Pair(weth).balanceOf(address(exactSwap)));
+        uint256 foo = (1 ether) -
+            (IUniswapV2Pair(weth).balanceOf(address(exactSwap)));
 
         uint256 d = (foo * 997 * r0) / ((r1 * 1000) + (997 * foo));
 
         uint256 puzzleBal = IUniswapV2Pair(usdc).balanceOf(address(exactSwap));
 
+        console2.log("WETH Balance", foo);
+        console2.log("USDC Balance", puzzleBal);
         require(puzzleBal / 1e6 == 1337, "Puzzle Balance Not 1337 USDC.");
         require(d / 1e6 == 1337, "Did Not Swap Exact Amount Of WETH.");
     }

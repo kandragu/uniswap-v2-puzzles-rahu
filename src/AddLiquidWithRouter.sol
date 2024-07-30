@@ -59,6 +59,8 @@ contract AddLiquidWithRouter {
         uint256 amountB = (amountA * (reserveB)) / reserveA;
         console.log("amountB", amountB);
 
+        console.log("reserveA, reserveB", reserveA, reserveB);
+
         IUniswapV2Router(router).addLiquidityETH{value: 1 ether}(
             usdcAddress,
             1000 * 10 ** 6,
