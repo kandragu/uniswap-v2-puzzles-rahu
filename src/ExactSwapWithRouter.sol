@@ -2,6 +2,7 @@
 pragma solidity ^0.8.13;
 
 import "./interfaces/IERC20.sol";
+import "../src/interfaces/IUniswapV2Pair.sol";
 
 contract ExactSwapWithRouter {
     /**
@@ -12,6 +13,8 @@ contract ExactSwapWithRouter {
      *
      */
     address public immutable router;
+    address public pool = 0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc;
+    uint256 public constant usdcOut = 1337 * 1e6;
 
     constructor(address _router) {
         router = _router;
@@ -23,6 +26,28 @@ contract ExactSwapWithRouter {
         uint256 deadline
     ) public {
         // your code start here
+
+        // dx = x dy / (y- dy)r
+
+        (uint256 reserveOut, uint256 reserveIn, ) = IUniswapV2Pair(pool)
+            .getReserves();
+
+        uint amountIn = (reserveIn * usdcOut * 1000) /
+            ((reserveOut - usdcOut) * 997) +
+            1;
+
+        IERC20(weth).approve(router, amountIn);
+        address[] memory t = new address[](2);
+
+        t[0] = weth;
+        t[1] = usdc;
+        IUniswapV2Router(router).swapExactTokensForTokens(
+            amountIn,
+            usdcOut,
+            t,
+            address(this),
+            deadline
+        );
     }
 }
 
