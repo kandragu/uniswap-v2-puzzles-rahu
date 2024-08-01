@@ -65,6 +65,20 @@ contract MyMevBot {
             price0,
             price1
         );
+
+        //start of code
+        // flash loan
+        IUniswapV3Pool(flashLenderPool).flash(
+            address(this),
+            1000 * 1e6,
+            0,
+            abi.encodeWithSignature(
+                "uniswapV3FlashCallback(uint256,uint256,bytes)",
+                0,
+                0,
+                ""
+            )
+        );
     }
 
     function uniswapV3FlashCallback(
@@ -74,11 +88,17 @@ contract MyMevBot {
     ) external {
         callMeCallMe();
 
+        uint256 usdcBal = IERC20(usdc).balanceOf(address(this));
+        console2.log("fee0: %d", _fee0);
+
         // your code start here
+        // transfer the USDC to the USDC_WETH_pool
+        IERC20(usdc).transfer(msg.sender, 1000 * 1e6 + _fee0);
     }
 
     function callMeCallMe() private {
         uint256 usdcBal = IERC20(usdc).balanceOf(address(this));
+        console2.log("usdcBal: %d", usdcBal / 1e6);
         require(msg.sender == address(flashLenderPool), "not callback");
         require(
             flashLoaned = usdcBal >= 1000 * 1e6,

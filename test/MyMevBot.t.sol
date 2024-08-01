@@ -21,7 +21,7 @@ contract ArbitrageTest is Test {
 
         myMevBot = new MyMevBot(flashLenderPool, weth, usdc, usdt, router);
 
-        /* vm.prank(0xcEe284F754E854890e311e3280b767F80797180d);
+        vm.prank(0xcEe284F754E854890e311e3280b767F80797180d);
         IUniswapV2Pair(usdt).transfer(ETH_USDT_pool, 3_000_000 * 1e6);
 
         vm.prank(0xF04a5cC80B1E94C69B48f5ee68a08CD2F09A7c3E);
@@ -29,7 +29,10 @@ contract ArbitrageTest is Test {
 
         IUniswapV2Pair(ETH_USDT_pool).mint(
             0x4B16c5dE96EB2117bBE5fd171E4d203624B014aa
-        );*/
+        );
+
+        vm.prank(0xcEe284F754E854890e311e3280b767F80797180d);
+        IUniswapV2Pair(usdc).transfer(address(myMevBot), 1 * 1e6);
     }
 
     function test_PerformArbitrage() public {
