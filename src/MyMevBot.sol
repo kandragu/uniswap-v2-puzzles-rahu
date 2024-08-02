@@ -43,37 +43,10 @@ contract MyMevBot {
     }
 
     function performArbitrage() public {
-        // your code here
-        // get the price in both pools
-        (uint256 reserve0, uint256 reserve1, ) = IUniswapV2Pair(USDC_WETH_pool)
-            .getReserves();
-
-        console2.log(
-            "reserve0(USDC_WETH_pool): %d, reserve1: %d",
-            reserve0 / 1e6,
-            reserve1 / 1e18
-        );
-        // address token0 = IUniswapV2Pair(USDC_WETH_pool).token0();
-        // console2.log("token0(USDC_WETH_pool): %s", token0);
-
-        uint256 price0 = (reserve0 / 1e6) / (reserve1 / 1e18);
-        (reserve0, reserve1, ) = IUniswapV2Pair(ETH_USDT_pool).getReserves();
-        // address tokenZero = IUniswapV2Pair(ETH_USDT_pool).token0();
-        // console2.log("token0(ETH_USDT_pool): %s", tokenZero);
-
-        uint256 price1 = (reserve1 / 1e6) / (reserve0 / 1e18);
-
-        console2.log(
-            "price0(USDC_WETH_pool): %d, price1(ETH_USDT_pool): %d",
-            price0,
-            price1
-        );
-
-        //start of code
         // flash loan
         IUniswapV3Pool(flashLenderPool).flash(
             address(this),
-            loanAmount,
+            loanAmount, // usdc to borrow
             0,
             abi.encode(usdc, weth, loanAmount, 0)
         );
@@ -86,12 +59,9 @@ contract MyMevBot {
     ) external {
         callMeCallMe();
 
-        uint256 usdcBal = IERC20(usdc).balanceOf(address(this));
-        console2.log("fee0: %d", _fee0);
-
         // your code start here
         // 1. swap the USDC to WETH from the USDC_WETH_pool as the price is lesser
-        // 2. calculate the exact amount of output token weth to receive ( may be some slippage in the real world)
+        // 2. calculate the exact amount of output token weth to receive
 
         (uint256 reserveIn, uint256 reserveOut, ) = IUniswapV2Pair(
             USDC_WETH_pool
@@ -99,13 +69,12 @@ contract MyMevBot {
 
         uint256 amountOutMin = (loanAmount * 997 * reserveOut) /
             ((reserveIn * 1000) + (997 * loanAmount));
-        console2.log("amountOutMin", amountOutMin);
 
         address[] memory path = new address[](2);
         path[0] = usdc;
         path[1] = weth;
 
-        // Transfer usdc to the router
+        // Approve usdc to the router
         IERC20(usdc).approve(router, loanAmount);
 
         IUniswapV2Router(router).swapExactTokensForTokens(
@@ -113,12 +82,11 @@ contract MyMevBot {
             amountOutMin,
             path,
             address(this),
-            block.timestamp + 100
+            block.timestamp + 100 // what is the better way to set the deadline?
         );
 
         // get the weth balance
         uint256 wethBal = IERC20(weth).balanceOf(address(this));
-        console2.log("wethBal: %d", wethBal / 1e18);
 
         // 3. swap the WETH to USDT from the ETH_USDT_pool
         // 4. calculate the exact amount of output token usdt to receive ( may be some slippage in the real world)
@@ -127,12 +95,11 @@ contract MyMevBot {
         amountOutMin =
             (wethBal * 997 * reserveOut) /
             ((reserveIn * 1000) + (997 * wethBal));
-        console2.log("WETH amountOutMin", amountOutMin);
 
         path[0] = weth;
         path[1] = usdt;
 
-        // Transfer weth to the router
+        // Approve weth to the router
         IERC20(weth).approve(router, wethBal);
 
         IUniswapV2Router(router).swapExactTokensForTokens(
@@ -143,12 +110,8 @@ contract MyMevBot {
             block.timestamp + 100
         );
 
-        // 5. check the USDC balance
-        uint256 usdcBalAfter = IERC20(usdc).balanceOf(address(this));
-        console2.log("usdcBalAfter: %d", usdcBalAfter / 1e6);
         // get the USDT balance
         uint256 usdtBal = IERC20(usdt).balanceOf(address(this));
-        console2.log("usdtBal: %d", usdtBal / 1e6);
 
         // swap from usdt to usdc
         path[0] = usdt;
@@ -161,24 +124,12 @@ contract MyMevBot {
         (reserveIn, reserveOut, ) = IUniswapV2Pair(USDC_USDT_pool)
             .getReserves();
 
-        console2.log(
-            "reserveIn(USDC_USDT_pool): %d, reserveOut: %d",
-            reserveIn / 1e6,
-            reserveOut / 1e6
-        );
-        // price of usdt to usdc
-        uint256 usdtPrice = (reserveIn) / (reserveOut);
-        console2.log("usdtPrice: %d", usdtPrice);
         amountOutMin =
             (usdtBal * 997 * reserveOut) /
             ((reserveIn * 1000) + (997 * usdtBal));
 
-        console2.log("amountOutMin usdt -> usdc: %d", amountOutMin);
-
         // slippage of 1%
         amountOutMin = (amountOutMin * 99) / 100;
-
-        console2.log("amountOutMin usdt -> usdc: %d", amountOutMin);
 
         IUniswapV2Router(router).swapExactTokensForTokens(
             usdtBal,
@@ -188,16 +139,12 @@ contract MyMevBot {
             block.timestamp + 100
         );
 
-        usdcBalAfter = IERC20(usdc).balanceOf(address(this));
-        console2.log("usdcBalAfter usdt -> usdc: %d", usdcBalAfter / 1e6);
-
         // transfer the USDC to the USDC_WETH_pool
         IERC20(usdc).transfer(msg.sender, loanAmount + _fee0);
     }
 
     function callMeCallMe() private {
         uint256 usdcBal = IERC20(usdc).balanceOf(address(this));
-        console2.log("usdcBal: %d", usdcBal / 1e6);
         require(msg.sender == address(flashLenderPool), "not callback");
         require(
             flashLoaned = usdcBal >= loanAmount,
