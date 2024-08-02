@@ -30,17 +30,14 @@ contract ArbitrageTest is Test {
         IUniswapV2Pair(ETH_USDT_pool).mint(
             0x4B16c5dE96EB2117bBE5fd171E4d203624B014aa
         );
-
-        vm.prank(0xcEe284F754E854890e311e3280b767F80797180d);
-        IUniswapV2Pair(usdc).transfer(address(myMevBot), 1 * 1e6);
     }
 
     function test_PerformArbitrage() public {
         vm.prank(address(0xb0b));
         myMevBot.performArbitrage();
 
-        // uint256 puzzleBal = IUniswapV2Pair(usdc).balanceOf(address(myMevBot));
+        uint256 puzzleBal = IUniswapV2Pair(usdc).balanceOf(address(myMevBot));
 
-        // require(puzzleBal > 0, "Arbitrage Failed.");
+        require(puzzleBal > 0, "Arbitrage Failed.");
     }
 }
