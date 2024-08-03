@@ -17,7 +17,7 @@ contract SyncAndSkimTest is Test {
 
     function setUp() public {
         vm.rollFork(20055371);
-        (r0, r1,) = IUniswapV2Pair(pool).getReserves();
+        (r0, r1, ) = IUniswapV2Pair(pool).getReserves();
     }
 
     function test_PerformSync() public {
@@ -34,7 +34,7 @@ contract SyncAndSkimTest is Test {
         uint256 wethBal = IUniswapV2Pair(weth).balanceOf(pool);
         uint256 amplBal = IUniswapV2Pair(ampl).balanceOf(pool);
 
-        (uint256 r00, uint256 r11,) = IUniswapV2Pair(pool).getReserves();
+        (uint256 r00, uint256 r11, ) = IUniswapV2Pair(pool).getReserves();
 
         require(wethBal == r00 && amplBal == r11, "Sync Failed.");
     }
@@ -58,6 +58,9 @@ contract SyncAndSkimTest is Test {
         uint256 wethPuzzleBal = IUniswapV2Pair(weth).balanceOf(address(skim));
         uint256 amplPuzzleBal = IUniswapV2Pair(ampl).balanceOf(address(skim));
 
-        require(wethPuzzleBal > 0 && amplPuzzleBal > 0, "Pool Differences Not Sent To Skim Contract.");
+        require(
+            wethPuzzleBal > 0 && amplPuzzleBal > 0,
+            "Pool Differences Not Sent To Skim Contract."
+        );
     }
 }
