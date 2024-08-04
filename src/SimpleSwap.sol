@@ -24,7 +24,8 @@ contract SimpleSwap {
          */
 
         // your code start here
-        IERC20(weth).transfer(pool, 1 ether);
-        IUniswapV2Pair(pool).swap(3000 * 1e6, 0, address(this), "");
+        bool success = IERC20(weth).transfer(pool, 1 ether);
+        require(success, "Transfer failed");
+        IUniswapV2Pair(pool).swap(2500 * 1e6, 0, address(this), "");
     }
 }
