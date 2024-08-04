@@ -17,8 +17,29 @@ contract MultiHop {
         router = _router;
     }
 
-    function performMultiHopWithRouter(address mkr, address weth, address elon, uint256 deadline) public {
-        // your code start here
+    function performMultiHopWithRouter(
+        address mkr,
+        address weth,
+        address elon,
+        uint256 deadline
+    ) public {
+        // path: MKR -> WETH -> ELON
+        address[] memory path = new address[](3);
+        path[0] = mkr;
+        path[1] = weth;
+        path[2] = elon;
+
+        uint256 amountIn = IERC20(mkr).balanceOf(address(this));
+
+        IERC20(mkr).approve(router, amountIn);
+
+        IUniswapV2Router(router).swapExactTokensForTokens(
+            IERC20(mkr).balanceOf(address(this)),
+            0,
+            path,
+            address(this),
+            deadline
+        );
     }
 }
 
